@@ -11,7 +11,12 @@ public class EntropyJudger {
     public static void main(String[] args) {
         FileEntropyCalculator.checkArguments(args);
         FileEntropyCalculator.calculateFileEntropy(Paths.get(args[0]));
-        isLikelyToBeNaturalLang(FileEntropyCalculator.getFileEntropy());
+        if (isLikelyToBeNaturalLang(FileEntropyCalculator.getFileEntropy())) {
+            System.out.println("The text could be a natural language text");
+            System.out.println("Vowels entropy: " + FileEntropyCalculator.getVowelsEntropy());
+        } else {
+            System.out.println("The text seems to be machine-generated");
+        }
     }
 
     /**
@@ -20,12 +25,7 @@ public class EntropyJudger {
      *
      * @param entropy the entropy of the file
      */
-    private static void isLikelyToBeNaturalLang(double entropy) {
-        if (entropy <= 5.5 || FileEntropyCalculator.getVowelsEntropy() >= 1) {
-            System.out.println("The text could be a natural language text");
-            System.out.println("Vowels entropy: " + FileEntropyCalculator.getVowelsEntropy());
-        } else {
-            System.out.println("The text seems to be machine-generated");
-        }
+    private static boolean isLikelyToBeNaturalLang(double entropy) {
+        return entropy <= 5.5 || FileEntropyCalculator.getVowelsEntropy() >= 1;
     }
 }
