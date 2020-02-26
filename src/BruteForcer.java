@@ -9,6 +9,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Bruteforce tool for ITS Lab1
+ *
+ * @author Sergio Conti Rossini
+ * @version 1.0
+ */
 public class BruteForcer {
     public static final String KALGORITHM = "AES";
     public static final String CALGORITHM = KALGORITHM + "/CBC/PKCS5Padding";
@@ -38,6 +44,14 @@ public class BruteForcer {
         }
     }
 
+    /**
+     * Method to generate some possible key starting from the written iv of the file
+     *
+     * @return List of key candidates for bruteforce
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws NoSuchPaddingException
+     */
     static ArrayList<byte[]> keyGen() throws NoSuchAlgorithmException, IOException, NoSuchPaddingException {
         ArrayList<byte[]> keyList = new ArrayList<>();
         InputStream is = new FileInputStream(inFile);
@@ -57,11 +71,23 @@ public class BruteForcer {
         return keyList;
     }
 
-    public static boolean attemptDecryption(byte[] rawKey) throws NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
+    public static void attemptDecryption(byte[] rawKey) throws NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
         decrypt(rawKey);
         FileEntropyCalculator.calculateFileEntropy(Paths.get(outFile));
-        return EntropyJudger.isLikelyToBeNaturalLang(FileEntropyCalculator.getFileEntropy());
     }
+
+    /**
+     * Method took from original ransomware source code
+     *
+     * @param rawKey key with which the data will be decrypted
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws InvalidKeyException
+     */
 
     public static void decrypt(byte[] rawKey) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
         SecretKey key = new SecretKeySpec(rawKey, 0, rawKey.length, KALGORITHM);
@@ -76,6 +102,15 @@ public class BruteForcer {
         }
     }
 
+    /**
+     * Method took from original ransomware source code
+     *
+     * @param is     inputStream for the encrypted file
+     * @param cipher cipher instance used
+     * @return returning the iv read from file
+     * @throws IOException
+     */
+
     public static IvParameterSpec readIv(InputStream is, Cipher cipher) throws IOException {
         byte[] rawIv = new byte[cipher.getBlockSize()];
         int inBytes = is.read(rawIv);
@@ -87,6 +122,16 @@ public class BruteForcer {
         return new IvParameterSpec(rawIv);
     }
 
+    /**
+     * Method took from original ransomware source code
+     *
+     * @param is     InputStream to plain text file to be encrypted
+     * @param os     OutPutStream to the output file where the encrypted data will be saved to
+     * @param cipher instance of used cipher
+     * @throws IOException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
     public static void crypt(InputStream is, OutputStream os, Cipher cipher) throws IOException, BadPaddingException, IllegalBlockSizeException {
         boolean more = true;
         byte[] input = new byte[cipher.getBlockSize()];
