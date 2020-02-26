@@ -29,7 +29,6 @@ public class FileEntropyCalculator {
             EntropyCalculator ec = new EntropyCalculator(fileBytes);
             fileEntropy = ec.calculateEntropy();
             vowelsEntropy = ec.getVowelsEntropy();
-            System.out.println("The entropy of the provided file is: " + fileEntropy);
         } catch (
                 IOException e) {
             System.out.println("The file provided seems not to be existing or accessible... " + path.toString());
