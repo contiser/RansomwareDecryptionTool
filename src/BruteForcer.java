@@ -21,6 +21,7 @@ public class BruteForcer {
 
         ArrayList<byte[]> keys;
         keys = keyGen();
+        long startTime = System.nanoTime();
         for (byte[] rawKey : keys) {
             try {
                 System.out.print("Attempt with : " + Arrays.toString(rawKey));
@@ -29,6 +30,7 @@ public class BruteForcer {
                 FileEntropyCalculator.calculateFileEntropy(Paths.get("D:\\SWITCHdrive\\Documents\\ITS\\Lab 1\\itsec-secret-key-crypto\\mystery.decryptattempt"));
                 if (EntropyJudger.isLikelyToBeNaturalLang(FileEntropyCalculator.getFileEntropy())) {
                     System.out.println("The decrypted file seems being in a natural language too!");
+                    System.out.println("Process duration: " + (System.nanoTime() - startTime) / 1000000 + "ms");
                     System.exit(0);
                 }
             } catch (Exception ignored) {
