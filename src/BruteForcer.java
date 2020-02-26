@@ -44,14 +44,14 @@ public class BruteForcer {
         InputStream is = new FileInputStream(inFile);
         IvParameterSpec ivParameterSpec = readIv(is, Cipher.getInstance(CALGORITHM));
         keyList.add(ivParameterSpec.getIV());
-        for (int d = 0; d <= 20; d++) {
+        for (int d = 0; d <= 200; d++) {
             byte[] keyCandidate = keyList.get(0).clone();
             byte newByte = (byte) (keyCandidate[0] - d);
             keyCandidate[0] = newByte;
             keyList.add(keyCandidate);
         }
-        for (int d = 0; d <= 20; d++) {
-            byte[] keyCandidate = keyList.get(0);
+        for (int d = 0; d <= 200; d++) {
+            byte[] keyCandidate = keyList.get(0).clone();
             keyCandidate[0] = (byte) (keyCandidate[0] + d);
             keyList.add(keyCandidate);
         }
