@@ -16,12 +16,11 @@ public class BruteForcer {
     private static String outFile;
 
     public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
+        long startTime = System.nanoTime();
         BruteForcer.inFile = args[0];
         BruteForcer.outFile = args[1];
-
         ArrayList<byte[]> keys;
         keys = keyGen();
-        long startTime = System.nanoTime();
         for (byte[] rawKey : keys) {
             try {
                 System.out.print("Attempt with : " + Arrays.toString(rawKey));
