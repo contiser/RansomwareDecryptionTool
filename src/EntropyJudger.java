@@ -25,7 +25,7 @@ public class EntropyJudger {
      *
      * @param entropy the entropy of the file
      */
-    private static boolean isLikelyToBeNaturalLang(double entropy) {
+    public static boolean isLikelyToBeNaturalLang(double entropy) {
         return entropy <= 5.5 || FileEntropyCalculator.getVowelsEntropy() >= 1;
     }
 }
