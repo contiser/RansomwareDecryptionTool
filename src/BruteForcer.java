@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class BruteForcer {
     public static final String KALGORITHM = "AES";
@@ -16,15 +17,22 @@ public class BruteForcer {
     public static void main(String[] args) {
         BruteForcer.inFile = args[0];
         BruteForcer.outFile = args[1];
-        String[] keys = args[2].split(",");
-        for (String k : keys) {
-            byte[] rawKey = k.getBytes();
-            try {
-                System.out.println(k + attemptDecryption(rawKey));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            byte[] rawKey = keyGen().getEncoded();
+            System.out.println("Attempt with : " + Arrays.toString(rawKey));
+            System.out.println(Arrays.toString(rawKey) + attemptDecryption(rawKey));
+        } catch (Exception ignored) {
         }
+    }
+
+    static SecretKey keyGen() throws NoSuchAlgorithmException, IOException, NoSuchPaddingException {
+        KeyGenerator keyGen = KeyGenerator.getInstance(KALGORITHM);
+        try (InputStream is = new FileInputStream(inFile)) {
+            IvParameterSpec ivParameterSpec = readIv(is, Cipher.getInstance(CALGORITHM));
+            ivParameterSpec.getIV();
+            keyGen.init(128, new TotallySecureRandom());
+        }
+        return keyGen.generateKey();
     }
 
     public static boolean attemptDecryption(byte[] rawKey) throws NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
