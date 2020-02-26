@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BruteForcer {
@@ -14,25 +15,45 @@ public class BruteForcer {
     private static String inFile;
     private static String outFile;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
         BruteForcer.inFile = args[0];
         BruteForcer.outFile = args[1];
-        try {
-            byte[] rawKey = keyGen().getEncoded();
-            System.out.println("Attempt with : " + Arrays.toString(rawKey));
-            System.out.println(Arrays.toString(rawKey) + attemptDecryption(rawKey));
-        } catch (Exception ignored) {
+
+        ArrayList<byte[]> keys;
+        keys = keyGen();
+        for (byte[] rawKey : keys) {
+            try {
+                System.out.print("Attempt with : " + Arrays.toString(rawKey));
+                System.out.println(Arrays.toString(rawKey) + attemptDecryption(rawKey));
+                System.out.println("Success!\n");
+                FileEntropyCalculator.calculateFileEntropy(Paths.get("D:\\SWITCHdrive\\Documents\\ITS\\Lab 1\\itsec-secret-key-crypto\\mystery.decryptattempt"));
+                if (EntropyJudger.isLikelyToBeNaturalLang(FileEntropyCalculator.getFileEntropy())) {
+                    System.out.println("The decrypted file seems being in a natural language too!");
+                    System.exit(0);
+                }
+            } catch (Exception ignored) {
+                System.out.print("... Failed\n");
+            }
         }
     }
 
-    static SecretKey keyGen() throws NoSuchAlgorithmException, IOException, NoSuchPaddingException {
-        KeyGenerator keyGen = KeyGenerator.getInstance(KALGORITHM);
-        try (InputStream is = new FileInputStream(inFile)) {
-            IvParameterSpec ivParameterSpec = readIv(is, Cipher.getInstance(CALGORITHM));
-            ivParameterSpec.getIV();
-            keyGen.init(128, new TotallySecureRandom());
+    static ArrayList<byte[]> keyGen() throws NoSuchAlgorithmException, IOException, NoSuchPaddingException {
+        ArrayList<byte[]> keyList = new ArrayList<>();
+        InputStream is = new FileInputStream(inFile);
+        IvParameterSpec ivParameterSpec = readIv(is, Cipher.getInstance(CALGORITHM));
+        keyList.add(ivParameterSpec.getIV());
+        for (int d = 0; d <= 20; d++) {
+            byte[] keyCandidate = keyList.get(0).clone();
+            byte newByte = (byte) (keyCandidate[0] - d);
+            keyCandidate[0] = newByte;
+            keyList.add(keyCandidate);
         }
-        return keyGen.generateKey();
+        for (int d = 0; d <= 20; d++) {
+            byte[] keyCandidate = keyList.get(0);
+            keyCandidate[0] = (byte) (keyCandidate[0] + d);
+            keyList.add(keyCandidate);
+        }
+        return keyList;
     }
 
     public static boolean attemptDecryption(byte[] rawKey) throws NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
